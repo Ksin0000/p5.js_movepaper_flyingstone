@@ -1,5 +1,5 @@
-let S;//‘å‚«‚³
-let N;//ŒÂ”
+let S;//ï¿½å‚«ï¿½ï¿½
+let N;//ï¿½Âï¿½
 let V;
 let color_fill = 40;
 let color_stroke = 10;
@@ -51,7 +51,7 @@ function setup() {
 function draw() {
   background(20);
 
-  ellipse(mouseX, mouseY, 30, 30);
+  //ellipse(mouseX, mouseY, 30, 30);
 
   for(let i=0 ; i<V.length ;i++){
     //text(V[i].x, 10,10*i);
