@@ -1,61 +1,83 @@
-let S;//�傫��
-let N;//��
-let V;
+// グローバル変数の定義
+let S; // 図形のサイズ
+let N; // 図形の数
+let V; // 図形の配列
 let color_fill = 40;
 let color_stroke = 10;
 
-
-class Up_quad{
-  constructor(){
-    this.x = random(document.body.clientWidth);
-    this.y = document.body.clientHeight+S*2;
-    this.r = random(-5,5);
-    this.u = random(1,10)/10;
+class UpQuad {
+  constructor() {
+    this.x = random(windowWidth);
+    this.y = random(windowHeight); //windowHeight + S * 2;
+    this.t = random(TWO_PI); // 時間パラメータ
+    this.tv = random(0.01,-0.01); // 時間パラメータの進み方
+    this.speed = random(0.1, 1);
   }
 
-  update(){
-    this.y -=this.u;
-    if(this.y<-S*2){
-      this.y = document.body.clientHeight+S*2;
-      this.r = random(-5,5);
-      this.u = random(1,10)/10;
+  update() {
+    this.y -= this.speed;
+    if (this.y < -S * 2) {
+      this.reset();
+    }
+
+    this.t += this.tv; // 時間パラメータを更新
+    if (this.t > TWO_PI) {
+      this.t -= TWO_PI;
     }
   }
 
-  draw8mentai(){
+  reset() {
+    this.y = windowHeight + S * 2;
+    this.r = random(-5, 5);
+    this.speed = random(0.1, 1);
+  }
+
+  draw() {
     fill(color_fill);
     stroke(color_stroke);
-    quad(this.x, this.y+S, this.x+S, this.y, this.x, this.y-S, this.x-S, this.y);
+    
+    // メインの四角形を描画
+    let v1 = createVector(this.x, this.y + S);
+    let v2 = createVector(this.x + S, this.y);
+    let v3 = createVector(this.x, this.y - S);
+    let v4 = createVector(this.x - S, this.y);
+    quad(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, v4.x, v4.y);
 
-    let x_ = this.x+10;
-    let y_ = this.y+15;
-    line(x_, y_, this.x, this.y+S);
-    line(x_, y_, this.x, this.y-S);
-    line(x_, y_, this.x+S, this.y);
-    line(x_, y_, this.x-S, this.y);
+    // v_centerをレンズ型の下弦上の点に設定したいができてない
+    let v_center = createVector(
+      this.x + S * cos(this.t), 
+      this.y + S * 0.1 * sin(this.t)
+    );
+
+    // 内部の線を描画
+    line(v_center.x, v_center.y, v1.x, v1.y);
+    line(v_center.x, v_center.y, v2.x, v2.y);
+    line(v_center.x, v_center.y, v3.x, v3.y);
+    line(v_center.x, v_center.y, v4.x, v4.y);
   }
 }
 
-
 function setup() {
-  createCanvas(document.body.clientWidth, document.body.clientHeight);
+  createCanvas(windowWidth, windowHeight);
   frameRate(30);
   S = 70;
   N = 50;
-  V = new Array(N);
-  for(let i = 0 ; i<V.length ; i++){
-    V[i] = new Up_quad();
-  }
+  
+  // 図形の配列を初期化
+  V = Array(N).fill().map(() => new UpQuad());
 }
 
 function draw() {
   background(20);
 
-  //ellipse(mouseX, mouseY, 30, 30);
+  // すべての図形を更新して描画
+  V.forEach(quad => {
+    quad.draw();
+    quad.update();
+  });
+}
 
-  for(let i=0 ; i<V.length ;i++){
-    //text(V[i].x, 10,10*i);
-    V[i].draw8mentai();
-    V[i].update();
-  }
+// ウィンドウサイズが変更されたときにキャンバスをリサイズ
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
